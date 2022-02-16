@@ -63,14 +63,14 @@ def check_response(response):
 
 def parse_status(homework):
     """Извлекает статус домашней работы."""
-    homework_name = homework.get("homework_name")
-    if homework_name is None:
+    hw_name = homework.get("homework_name")
+    if hw_name is None:
         raise KeyError
     homework_status = homework.get("status")
     for key, value in HOMEWORK_STATUSES.items():
         if homework_status == key:
             verdict = value
-            return f'Изменился статус проверки работы "{homework_name}". {verdict}'
+            return f'Изменился статус проверки работы "{hw_name}". {verdict}'
     raise ValueError
 
 
