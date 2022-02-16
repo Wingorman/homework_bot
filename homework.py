@@ -33,12 +33,12 @@ HOMEWORK_STATUSES = {
 
 
 def send_message(bot, message):
-    """Отправка сообщения"""
+    """Отправка сообщения."""
     return bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
 
 
 def get_api_answer(current_timestamp):
-    """Pапрос к эндпоинту API-сервиса"""
+    """Pапрос к эндпоинту API-сервиса."""
     timestamp = current_timestamp or int(time.time())
     params = {"from_date": timestamp}
     answer = requests.get(url=ENDPOINT, headers=HEADERS, params=params)
@@ -62,7 +62,7 @@ def check_response(response):
 
 
 def parse_status(homework):
-    """Извлекает статус домашней работы"""
+    """Извлекает статус домашней работы."""
     homework_name = homework.get("homework_name")
     if homework_name is None:
         raise KeyError
@@ -75,6 +75,7 @@ def parse_status(homework):
 
 
 def check_tokens():
+    """Проверяет доступность переменных окружения."""
     tokens = all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID])
     if tokens:
         return True
