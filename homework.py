@@ -44,7 +44,7 @@ def get_api_answer(current_timestamp):
     answer = requests.get(url=ENDPOINT, headers=HEADERS, params=params)
     answer_code = answer.status_code
     if answer_code != requests.codes.ok:
-        message = f"Тут сообщение что что-то поломалось"
+        message = "Тут сообщение что что-то поломалось"
         raise RequestException(message)
     return answer.json()
 
@@ -115,7 +115,7 @@ def main():
             time.sleep(RETRY_TIME)
         else:
             if last_error:
-                message = f"Сбой в работе программы"
+                message = "Сбой в работе программы"
                 logging.info("БОТ ОКОНЧАТЕЛЬНО СЛОМАН")
                 send_message(bot, message)
             last_error = None
