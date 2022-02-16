@@ -1,9 +1,7 @@
 from requests.exceptions import RequestException
-from ast import Raise
 import logging
 import os
 import time
-
 import requests
 import telegram
 from dotenv import load_dotenv
@@ -35,7 +33,6 @@ HOMEWORK_STATUSES = {
 
 
 def send_message(bot, message):
-    logger.info("отправка")
     return bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
 
 
