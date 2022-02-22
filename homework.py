@@ -34,14 +34,27 @@ HOMEWORK_STATUSES = {
 
 def send_message(bot, message):
     """Отправка сообщения."""
-    return bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
+    logger.info("Отправка сообщения!")
+    try:
+        bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
+
+    except telegram.error as error:
+        error_message = f"Ошибка отправки сообщения {error}"
+        logger.error(error_message)
+        raise telegram.error(error_message)
 
 
 def get_api_answer(current_timestamp):
-    """Pапрос к эндпоинту API-сервиса."""
+    """Запрос к эндпоинту API-сервиса."""
     timestamp = current_timestamp or int(time.time())
     params = {"from_date": timestamp}
-    answer = requests.get(url=ENDPOINT, headers=HEADERS, params=params)
+    try:
+        answer = requests.get(url=ENDPOINT, headers=HEADERS, params=params)
+    except requests.RequestException as error:
+        error_message = f"Ошибка запроса API-сервиса! {error}"
+        logger.error(error_message)
+        raise requests(error_message)
+
     answer_code = answer.status_code
     if answer_code != requests.codes.ok:
         message = "Тут сообщение что что-то поломалось"
@@ -52,12 +65,15 @@ def get_api_answer(current_timestamp):
 def check_response(response):
     """Проверяет ответ API на корректнось."""
     if not isinstance(response, dict):
-        raise TypeError
+        error_message = "response не словарь"
+        raise TypeError(error_message)
     homework = response.get("homeworks")
     if homework is None:
-        raise TypeError
+        error_message = "Отсутствует homework"
+        raise TypeError(error_message)
     if not isinstance(homework, list):
-        raise TypeError
+        error_message = "homework не список"
+        raise TypeError(error_message)
     return homework
 
 
@@ -65,13 +81,14 @@ def parse_status(homework):
     """Извлекает статус домашней работы."""
     hw_name = homework.get("homework_name")
     if hw_name is None:
-        raise KeyError
+        error_message = "Пустое значение hw_name"
+        raise KeyError(error_message)
     homework_status = homework.get("status")
-    for key, value in HOMEWORK_STATUSES.items():
-        if homework_status == key:
-            verdict = value
-            return f'Изменился статус проверки работы "{hw_name}". {verdict}'
-    raise ValueError
+    verdict = HOMEWORK_STATUSES.get(homework_status)
+    if verdict is None:
+        error_message = "Пустое значение verdict"
+        raise KeyError(error_message)
+    return f'Изменился статус проверки работы "{hw_name}". {verdict}'
 
 
 def check_tokens():
@@ -109,6 +126,7 @@ def main():
             time.sleep(RETRY_TIME)
 
         except Exception as error:
+            logging.error("Ошибка в работе с response", exc_info=True)
             message = f"Сбой в работе программы: {error}"
             if last_error != error:
                 send_message(bot, message)
