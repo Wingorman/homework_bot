@@ -32,16 +32,24 @@ HOMEWORK_STATUSES = {
 }
 
 
+class SendMessageError(Exception):
+    """Ошибка отправки сообщения."""
+
+    pass
+
+
 def send_message(bot, message):
     """Отправка сообщения."""
     logger.info("Отправка сообщения!")
     try:
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
 
-    except telegram.error as error:
-        error_message = f"Ошибка отправки сообщения {error}"
+    except telegram.error.TelegramError as error:
+        error_message = (
+            f'При отправке сообщения "{message}" возникла ошибка: {error}'
+        )
         logger.error(error_message)
-        raise telegram.error(error_message)
+        raise SendMessageError(message)
 
 
 def get_api_answer(current_timestamp):
